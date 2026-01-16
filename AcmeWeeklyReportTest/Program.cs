@@ -22,7 +22,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan=TimeSpan.FromHours(1);
         options.SlidingExpiration = true;//有操作自動繼續此cookie
     });
-
+Console.WriteLine(">>> ENV DefaultConnection=" + Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection"));
+Console.WriteLine(">>> CFG DefaultConnection=" + builder.Configuration.GetConnectionString("DefaultConnection"));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
