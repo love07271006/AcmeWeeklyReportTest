@@ -1,0 +1,139 @@
+﻿@model AcmeWeeklyReportTest.Models.WorkLogIndexViewModel
+<p>Is Manager：@User.IsInRole("Manager")</p>
+@using AcmeWeeklyReportTest.Models
+
+@{
+    ViewData["Title"] = "我的工作日誌";
+}
+
+<h2 class="mb-3">我的工作日誌</h2>
+
+@if (TempData["Msg"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@* @if (TempData["Msg"] != null)
+{
+    <div class="alert alert-success">@TempData["Msg"]</div>
+} *@
+
+<form asp-controller="WorkLog" asp-action="Index" method="get" class="card mb-3">
+    <div class="card-body">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label asp-for="StartFrom" class="form-label"></label>
+                <input asp-for="StartFrom" type="date" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="StartTo" class="form-label"></label>
+                <input asp-for="StartTo" type="date" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label asp-for="Status" class="form-label"></label>
+                <select asp-for="Status" class="form-select">
+                    <option value="">全部</option>
+                    @foreach (var opt in Enum.GetValues<WorkStatus>())
+                    {
+                        <option value="@((int)opt)">@opt</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Keyword" class="form-label"></label>
+                <input asp-for="Keyword" class="form-control" placeholder="搜尋工作事項/備註" />
+            </div>
+            <div class="col-md-1 d-grid">
+                <button type="submit" class="btn btn-primary">搜尋</button>
+            </div>
+        </div>
+
+        <div class="mt-2">
+            <a asp-controller="WorkLog" asp-action="Index" class="btn btn-link p-0">清除條件</a>
+        </div>
+    </div>
+</form>
+
+@if (Model.Items == null || Model.Items.Count == 0)
+{
+    <div class="alert alert-info">
+        沒有符合條件的工作日誌。
+        <a asp-controller="WorkLog" asp-action="Create">新增一筆</a>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead>
+                <tr>
+                    @if (User.IsInRole("Manager"))
+                    {
+                        <th>員工</th>
+                    }
+                    <th>開始</th>
+                    <th>結束</th>
+                    <th>工作事項</th>
+                    <th>狀態</th>
+                    <th class="text-end">工時</th>
+                    <th>備註</th>
+                    <th class="text-end">建立時間</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        @if (User.IsInRole("Manager"))
+                        {
+                            <td>@item.UserSnNavigation.UserName</td>
+                        }
+                        <td>@item.StartDate.ToString("yyyy/MM/dd")</td>
+                        <td>@item.EndDate.ToString("yyyy/MM/dd")</td>
+                        <td style="white-space: pre-wrap;">@item.WorkItem</td>
+                        <td>@StatusText(item.Status)</td>
+                        <td class="text-end">@item.WorkHours</td>
+                        <td style="white-space: pre-wrap;">@item.Remark</td>
+                        <td class="text-end">@item.CreatedAt.ToString("yyyy/MM/dd HH:mm")</td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.Sn"
+                               class="btn btn-sm btn-info me-1">查看</a>
+                            @if (!User.IsInRole("Manager"))
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.Sn"
+                                   class="btn btn-sm btn-outline-primary me-1">編輯</a>
+                                <a asp-action="Delete" asp-route-id="@item.Sn"
+                                   class="btn btn-sm btn-outline-danger">刪除</a>
+                            }
+                            @* <a asp-action="Details" asp-route-id="@item.Sn"
+                               class="btn btn-sm btn-info me-1">查看</a>
+                            <a asp-controller="WorkLog" asp-action="Edit" asp-route-id="@item.Sn"
+                               class="btn btn-sm btn-outline-primary me-1">編輯</a>
+                            <a asp-controller="WorkLog" asp-action="Delete" asp-route-id="@item.Sn"
+                               class="btn btn-sm btn-outline-danger">刪除</a> *@
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <a asp-controller="WorkLog" asp-action="Create" class="btn btn-primary">
+        ➕ 新增工作日誌
+    </a>
+}
+
+@functions {
+    string StatusText(int status) => status switch
+    {
+        0 => "未開始",
+        1 => "進行中",
+        2 => "待處理",
+        3 => "已完成",
+        _ => $"未知({status})"
+    };
+}

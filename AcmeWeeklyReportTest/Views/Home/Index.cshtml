@@ -1,0 +1,35 @@
+﻿@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <div class="alert alert-success mt-3">
+            <div><strong>登入狀態：</strong>已登入 ✅</div>
+            <div><strong>Account：</strong>@User.Identity?.Name</div>
+            <div><strong>UserSn：</strong>@User.FindFirstValue(ClaimTypes.NameIdentifier)</div>
+            <div><strong>UserName：</strong>@User.FindFirstValue("UserName")</div>
+        </div>
+
+        <form asp-controller="Auth" asp-action="Logout" method="post" class="mt-2">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-outline-danger">登出</button>
+        </form>
+    }
+    else
+    {
+        <div class="alert alert-warning mt-3">
+            <div><strong>登入狀態：</strong>未登入 ❌</div>
+            <a class="btn btn-primary mt-2" asp-controller="Auth" asp-action="Login">前往登入</a>
+        </div>
+    }
+
+    <p class="mt-4">
+        Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.
+    </p>
+</div>

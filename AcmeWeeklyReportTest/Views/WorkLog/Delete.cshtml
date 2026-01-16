@@ -1,0 +1,43 @@
+﻿@model AcmeWeeklyReportTest.Models.WorkLog
+
+@{
+    ViewData["Title"] = "刪除確認";
+}
+
+<h2 class="mb-3 text-danger">刪除確認</h2>
+
+<div class="alert alert-warning">
+    你確定要刪除這筆工作日誌嗎？刪除後無法復原。
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">開始日期</dt>
+            <dd class="col-sm-9">@Model.StartDate.ToString("yyyy/MM/dd")</dd>
+
+            <dt class="col-sm-3">結束日期</dt>
+            <dd class="col-sm-9">@Model.EndDate.ToString("yyyy/MM/dd")</dd>
+
+            <dt class="col-sm-3">工作事項</dt>
+            <dd class="col-sm-9" style="white-space: pre-wrap;">@Model.WorkItem</dd>
+
+            <dt class="col-sm-3">狀態</dt>
+            <dd class="col-sm-9">@Model.Status</dd>
+
+            <dt class="col-sm-3">工時</dt>
+            <dd class="col-sm-9">@Model.WorkHours</dd>
+
+            <dt class="col-sm-3">備註</dt>
+            <dd class="col-sm-9" style="white-space: pre-wrap;">@Model.Remark</dd>
+        </dl>
+    </div>
+</div>
+
+<form asp-controller="WorkLog" asp-action="DeleteConfirmed" method="post" class="mt-3">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.Sn" />
+
+    <button type="submit" class="btn btn-danger">確認刪除</button>
+    <a asp-controller="WorkLog" asp-action="Index" class="btn btn-secondary ms-2">取消</a>
+</form>

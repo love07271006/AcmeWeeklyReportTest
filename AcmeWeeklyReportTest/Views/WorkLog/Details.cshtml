@@ -1,0 +1,54 @@
+﻿@model AcmeWeeklyReportTest.Models.WorkLog
+
+@{
+    ViewData["Title"] = "查看週報";
+}
+
+<h2 class="mb-3">查看週報</h2>
+
+<table class="table table-bordered">
+    <tr>
+        <th>開始日期</th>
+        <td>@Model.StartDate</td>
+    </tr>
+    <tr>
+        <th>結束日期</th>
+        <td>@Model.EndDate</td>
+    </tr>
+    <tr>
+        <th>工作事項</th>
+        <td>@Model.WorkItem</td>
+    </tr>
+    <tr>
+        <th>完成狀態</th>
+        <td>@((AcmeWeeklyReportTest.Models.WorkStatus)Model.Status)</td>
+    </tr>
+    <tr>
+        <th>工作時數</th>
+        <td>@Model.WorkHours</td>
+    </tr>
+    <tr>
+        <th>備註</th>
+        <td>@Model.Remark</td>
+    </tr>
+    <tr>
+        <th>建立時間</th>
+        <td>@Model.CreatedAt</td>
+    </tr>
+</table>
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary">回列表</a>
+    @if (!User.IsInRole("Manager"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Sn" class="btn btn-primary ms-2">
+            編輯
+        </a>
+        <form asp-action="Delete" asp-route-id="@Model.Sn" method="post"
+              class="d-inline ms-2"
+              onsubmit="return confirm('確定要刪除這筆週報嗎？');">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-danger">刪除</button>
+        </form>
+    }  
+</div>
